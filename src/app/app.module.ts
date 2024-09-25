@@ -13,7 +13,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { HomeComponent } from './home/home.component';
 
 @NgModule({
-  declarations: [AppComponent, BookFlightComponent, BookedListComponent, HomeComponent],
+  declarations: [
+    AppComponent,
+    BookFlightComponent,
+    BookedListComponent,
+    HomeComponent,
+  ],
   imports: [
     BrowserModule,
     ApolloModule,
@@ -28,7 +33,7 @@ import { HomeComponent } from './home/home.component';
         return {
           cache: new InMemoryCache(),
           link: httpLink.create({
-            uri: 'http://localhost:4000/graphql', // GraphQL endpoint
+            uri: 'https://flight-booking-backend-nine.vercel.app/graphql', // GraphQL endpoint
           }),
         };
       },
