@@ -1,15 +1,30 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
     background-color: #97a6f8;
     color: white;
+    height: 64px;
   }
   
   .navbar .nav-links button {
-    margin-left: 10px;
-    color: black;
+    margin-right:15px;
+    color: #1a1111;
+    height: 40px;
+    width: 100px;
+    border-radius: 5px;
+    background: lightgreen;
+    border: 1px solid lightgreen;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .navbar .nav-links button :hover {
+    background: rgb(39, 131, 39);
+
+  }
+
+  .container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   
   .image-gallery {
@@ -27,5 +42,7 @@
   }
   
   h1{
+    margin-left: 10px;
     cursor: pointer;
+    color: black;
   }

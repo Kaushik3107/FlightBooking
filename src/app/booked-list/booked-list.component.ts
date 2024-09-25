@@ -1,5 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { FlightService } from '../services/flight.service';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
+
+const GET_BOOKED_FLIGHTS = gql`
+  query GetBookedFlights {
+    bookedFlights {
+      firstName
+      lastName
+      email
+      mobile
+      source
+      destination
+      date
+      time
+    }
+  }
+`;
 
 @Component({
   selector: 'app-booked-list',
@@ -9,25 +25,24 @@ import { FlightService } from '../services/flight.service';
 export class BookedListComponent implements OnInit {
   bookedFlights: any[] = [];
 
-  constructor(private flightService: FlightService) {
-    this.flightService.getBookedFlights().subscribe({
-      next: (result: any) => {
-        this.bookedFlights = result?.data?.bookedFlights || [];
-      },
-      error: (error: any) => {
-        console.error('Error fetching booked flights', error);
-      },
-    });
+  constructor(private apollo: Apollo) {}
+
+  ngOnInit(): void {
+    this.fetchBookedFlights();
   }
 
-  ngOnInit() {
-    this.flightService.getBookedFlights().subscribe({
-      next: (result: any) => {
-        this.bookedFlights = result?.data?.bookedFlights || [];
-      },
-      error: (error: any) => {
-        console.error('Error fetching booked flights', error);
-      },
-    });
+  fetchBookedFlights() {
+    this.apollo
+      .watchQuery({
+        query: GET_BOOKED_FLIGHTS,
+      })
+      .valueChanges.subscribe(
+        (result: any) => {
+          this.bookedFlights = result?.data?.bookedFlights;
+        },
+        (error) => {
+          console.error('Error fetching booked flights', error);
+        }
+      );
   }
 }

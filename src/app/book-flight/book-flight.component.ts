@@ -1,6 +1,22 @@
 import { Component } from '@angular/core';
-import { FlightService } from '../services/flight.service';
+import { Apollo } from 'apollo-angular';
+import gql from 'graphql-tag';
 import { Router } from '@angular/router';
+
+const BOOK_FLIGHT = gql`
+  mutation BookFlight($input: FlightInput!) {
+    bookFlight(input: $input) {
+      firstName
+      lastName
+      email
+      mobile
+      source
+      destination
+      date
+      time
+    }
+  }
+`;
 
 @Component({
   selector: 'app-book-flight',
@@ -8,7 +24,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./book-flight.component.css'],
 })
 export class BookFlightComponent {
-  firstName: string = ''; // Initialized to empty string
+  firstName: string = '';
   lastName: string = '';
   email: string = '';
   mobile: string = '';
@@ -17,38 +33,53 @@ export class BookFlightComponent {
   date: string = '';
   time: string = '';
 
-  constructor(private flightService: FlightService, private router: Router) {}
+  constructor(private apollo: Apollo, private router: Router) {}
 
   bookFlight() {
-    const flightData = {
-      firstName: this.firstName,
-      lastName: this.lastName,
-      email: this.email,
-      mobile: this.mobile,
-      source: this.source,
-      destination: this.destination,
-      date: this.date,
-      time: this.time,
-    };
-
-    this.flightService.bookFlight(flightData).subscribe({
-      next: (result: any) => {
-        console.log('Flight booked successfully', result);
-        alert('Flight booked successfully');
-        this.router.navigate(['/booked-list']);
-        // Reset form after submission
-        this.firstName = '';
-        this.lastName = '';
-        this.email = '';
-        this.mobile = '';
-        this.source = '';
-        this.destination = '';
-        this.date = '';
-        this.time = '';
-      },
-      error: (error: any) => {
-        console.error('Error booking flight', error);
-      },
-    });
+    this.apollo
+      .mutate({
+        mutation: BOOK_FLIGHT,
+        variables: {
+          input: {
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+            mobile: this.mobile,
+            source: this.source,
+            destination: this.destination,
+            date: this.date,
+            time: this.time,
+          },
+        },
+        // Refetch the query that fetches the list of booked flights
+        refetchQueries: [
+          {
+            query: gql`
+              query GetBookedFlights {
+                bookedFlights {
+                  firstName
+                  lastName
+                  email
+                  mobile
+                  source
+                  destination
+                  date
+                  time
+                }
+              }
+            `,
+          },
+        ],
+      })
+      .subscribe(
+        (response) => {
+          alert('Flight booked successfully');
+          this.router.navigate(['/booked-list']); // Redirect to booked list
+        },
+        (error) => {
+          console.error('Error booking flight', error);
+          alert('Error booking flight');
+        }
+      );
   }
 }
